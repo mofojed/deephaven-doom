@@ -36,6 +36,7 @@ function App() {
       gridRowColor: null,
       rowHoverBackgroundColor: null,
       columnHoverBackgroundColor: null,
+      scrollBarSize: 0,
     }),
     []
   );
