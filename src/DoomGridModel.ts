@@ -52,6 +52,7 @@ function getDoomKeyCode(event: GridKeyboardEvent): number {
 export class DoomGridModel extends GridModel {
   private width: number;
   private height: number;
+  private onUpdate: () => void;
   private memory: WebAssembly.Memory;
   private imageData: ImageData | null = null;
   private doomInstance: DoomInstance | null = null;
@@ -60,15 +61,19 @@ export class DoomGridModel extends GridModel {
   readonly metricCalculator: DoomMetricCalculator;
   readonly mouseHandler: GridMouseHandler;
 
-  constructor(
-    { width, height }: { width: number; height: number } = {
-      width: 640,
-      height: 400,
-    }
-  ) {
+  constructor({
+    width,
+    height,
+    onUpdate,
+  }: {
+    width: number;
+    height: number;
+    onUpdate: () => void;
+  }) {
     super();
     this.width = width;
     this.height = height;
+    this.onUpdate = onUpdate;
     this.consoleErrorString = this.consoleErrorString.bind(this);
     this.consoleLogString = this.consoleLogString.bind(this);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -137,7 +142,7 @@ export class DoomGridModel extends GridModel {
 
     this.imageData = new ImageData(rawData, this.width, this.height);
 
-    // console.log("this.imageData is", this.imageData.data);
+    this.onUpdate();
   }
 
   get rowCount(): number {
@@ -157,33 +162,12 @@ export class DoomGridModel extends GridModel {
   }
 
   backgroundColorForCell(column: number, row: number): NullableGridColor {
-    // const frame = context.getImageData(0, 0, width, height);
-    // const l = frame.data.length / 4;
-
-    // for (let i = 0; i < l; i++) {
-    //   const grey =
-    //     (frame.data[i * 4 + 0] +
-    //       frame.data[i * 4 + 1] +
-    //       frame.data[i * 4 + 2]) /
-    //     3;
-
-    //   frame.data[i * 4 + 0] = grey;
-    //   frame.data[i * 4 + 1] = grey;
-    //   frame.data[i * 4 + 2] = grey;
-    // }
-
-    // Need to get the color from the imageData. It's a one dimensional array of RGBA values, from top-left to bottom-right.
-    // The color for the cell at column, row is at index (row * width + column) * 4.
-    // The color for the red channel is at index (row * width + column) * 4.
-    // The color for the green channel is at index (row * width + column) * 4 + 1.
-    // The color for the blue channel is at index (row * width + column) * 4 + 2.
-    // The color for the alpha channel is at index (row * width + column) * 4 + 3.
-    // return "red";
-    // console.log("Image data blah", this.imageData);
-    const r = this.imageData?.data[(row * this.width + column) * 4];
-    const g = this.imageData?.data[(row * this.width + column) * 4 + 1];
-    const b = this.imageData?.data[(row * this.width + column) * 4 + 2];
-    return `rgba(${r}, ${g}, ${b}, 255)`;
+    // Gets the background colour from the image data
+    const colorIndex = (row * this.width + column) * 4;
+    const r = this.imageData?.data[colorIndex];
+    const g = this.imageData?.data[colorIndex + 1];
+    const b = this.imageData?.data[colorIndex + 2];
+    return `rgba(${r}, ${g}, ${b})`;
   }
 
   private handleKeyDown(event: GridKeyboardEvent) {
