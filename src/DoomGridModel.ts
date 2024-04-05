@@ -102,7 +102,7 @@ export class DoomGridModel extends GridModel {
       js: {
         js_console_log: this.consoleLogString,
         js_stdout: this.consoleLogString,
-        js_stderr: this.consoleLogString,
+        js_stderr: this.consoleErrorString,
         js_milliseconds_since_start: () => performance.now(),
         js_draw_screen: this.handleDrawScreen,
       },

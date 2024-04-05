@@ -4,7 +4,6 @@ import { DoomGridModel } from "./DoomGridModel";
 import { Grid, GridThemeType } from "@deephaven/grid";
 
 function App() {
-  // const memory = useMemo(() => new WebAssembly.Memory({ initial: 108 }), []);
   const gridRef = useRef<Grid>(null);
   const width = 320;
   const height = 200;
@@ -21,9 +20,11 @@ function App() {
     return [model.keyHandler];
   }, [model]);
 
-  const mouseHandlers = useMemo(() => {
-    return [model.mouseHandler];
-  }, [model]);
+  // Enable to stop all mouse events
+  // I have it turned off so you can still do selection in the grid, which kind of shows that it's more grid like.
+  // const mouseHandlers = useMemo(() => {
+  //   return [model.mouseHandler];
+  // }, [model]);
 
   const theme = useMemo(
     (): Partial<GridThemeType> => ({
@@ -38,6 +39,7 @@ function App() {
       rowHoverBackgroundColor: null,
       columnHoverBackgroundColor: null,
       scrollBarSize: 0,
+      rowBackgroundColors: "transparent",
     }),
     []
   );
