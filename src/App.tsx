@@ -6,8 +6,9 @@ import { Grid, GridThemeType } from "@deephaven/grid";
 function App() {
   // const memory = useMemo(() => new WebAssembly.Memory({ initial: 108 }), []);
   const gridRef = useRef<Grid>(null);
-  const width = 640;
-  const height = 400;
+  const width = 320;
+  const height = 200;
+  const pixelSize = 4;
   const onUpdate = useCallback(() => {
     gridRef.current?.forceUpdate();
   }, []);
@@ -28,8 +29,8 @@ function App() {
     (): Partial<GridThemeType> => ({
       autoSizeRows: false,
       autoSizeColumns: false,
-      rowHeight: 2,
-      columnWidth: 2,
+      rowHeight: pixelSize,
+      columnWidth: pixelSize,
       rowHeaderWidth: 0,
       columnHeaderHeight: 0,
       gridColumnColor: null,
@@ -44,13 +45,17 @@ function App() {
   return (
     <>
       <div
-        style={{ width: width * 2, height: height * 2, position: "relative" }}
+        style={{
+          width: width * pixelSize,
+          height: height * pixelSize,
+          position: "relative",
+        }}
       >
         <Grid
           ref={gridRef}
           model={model}
           keyHandlers={keyHandlers}
-          mouseHandlers={mouseHandlers}
+          // mouseHandlers={mouseHandlers}
           theme={theme}
         />
       </div>

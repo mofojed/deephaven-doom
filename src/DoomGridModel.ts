@@ -10,6 +10,10 @@ import { GridKeyboardEvent } from "@deephaven/grid/dist/KeyHandler";
 import { DoomMetricCalculator } from "./DoomMetricCalculator";
 import NullMouseHandler from "./NullMouseHandler";
 
+// Width of the game screen. Not sure how to set this dynamically, or if it's possible to.
+const WIDTH = 640;
+const HEIGHT = 400;
+
 type DoomInstance = {
   main: () => void;
   add_browser_event: (event: number, keyCode: number) => void;
@@ -50,10 +54,11 @@ function getDoomKeyCode(event: GridKeyboardEvent): number {
  * Play Doom in the Browser using @deephaven/grid with the DoomGridModel!
  */
 export class DoomGridModel extends GridModel {
-  private width: number;
-  private height: number;
-  private onUpdate: () => void;
-  private memory: WebAssembly.Memory;
+  private readonly width: number;
+  private readonly height: number;
+  private readonly scale: number;
+  private readonly onUpdate: () => void;
+  private readonly memory: WebAssembly.Memory;
   private imageData: ImageData | null = null;
   private doomInstance: DoomInstance | null = null;
 
@@ -62,17 +67,20 @@ export class DoomGridModel extends GridModel {
   readonly mouseHandler: GridMouseHandler;
 
   constructor({
+    onUpdate,
     width,
     height,
-    onUpdate,
   }: {
     width: number;
     height: number;
+
+    /** Triggered when there's an update to the screen */
     onUpdate: () => void;
   }) {
     super();
     this.width = width;
     this.height = height;
+    this.scale = WIDTH / this.width;
     this.onUpdate = onUpdate;
     this.consoleErrorString = this.consoleErrorString.bind(this);
     this.consoleLogString = this.consoleLogString.bind(this);
@@ -137,10 +145,10 @@ export class DoomGridModel extends GridModel {
     const rawData = new Uint8ClampedArray(
       this.memory.buffer,
       ptr,
-      this.width * this.height * 4
+      WIDTH * HEIGHT * 4
     );
 
-    this.imageData = new ImageData(rawData, this.width, this.height);
+    this.imageData = new ImageData(rawData, WIDTH, HEIGHT);
 
     this.onUpdate();
   }
@@ -163,7 +171,7 @@ export class DoomGridModel extends GridModel {
 
   backgroundColorForCell(column: number, row: number): NullableGridColor {
     // Gets the background colour from the image data
-    const colorIndex = (row * this.width + column) * 4;
+    const colorIndex = (row * WIDTH * this.scale + column * this.scale) * 4;
     const r = this.imageData?.data[colorIndex];
     const g = this.imageData?.data[colorIndex + 1];
     const b = this.imageData?.data[colorIndex + 2];
