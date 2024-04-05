@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 import doomUrl from "./assets/doom.wasm?url";
 import "./App.css";
+import { DoomGridModel } from "./DoomGridModel";
+import { Grid, GridThemeType } from "@deephaven/grid";
 
 function App() {
   const memory = useMemo(() => new WebAssembly.Memory({ initial: 108 }), []);
   const canvas = useRef<HTMLCanvasElement>(null);
   const width = 640;
   const height = 400;
+  const model = useMemo(() => new DoomGridModel({ width, height }), []);
 
   const readWasmString = useCallback(
     (offset: number, length: number) => {
@@ -76,7 +79,43 @@ function App() {
     })();
   }, [importObject]);
 
-  return <canvas width={width} height={height} ref={canvas} />;
+  const keyHandlers = useMemo(() => {
+    return [model.keyHandler];
+  }, [model]);
+
+  const mouseHandlers = useMemo(() => {
+    return [model.mouseHandler];
+  }, [model]);
+
+  const theme = useMemo(
+    (): Partial<GridThemeType> => ({
+      autoSizeRows: false,
+      autoSizeColumns: false,
+      rowHeight: 2,
+      columnWidth: 2,
+      rowHeaderWidth: 0,
+      columnHeaderHeight: 0,
+      gridColumnColor: null,
+      gridRowColor: null,
+      rowHoverBackgroundColor: null,
+      columnHoverBackgroundColor: null,
+    }),
+    []
+  );
+
+  return (
+    <>
+      <canvas width={width} height={height} ref={canvas} />
+      <div style={{ width, height, position: "relative" }}>
+        <Grid
+          model={model}
+          keyHandlers={keyHandlers}
+          mouseHandlers={mouseHandlers}
+          theme={theme}
+        />
+      </div>
+    </>
+  );
 }
 
 export default App;
