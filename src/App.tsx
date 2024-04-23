@@ -8,6 +8,7 @@ function App() {
   const width = 320;
   const height = 200;
   const pixelSize = 4;
+  const headerSize = 20;
   const onUpdate = useCallback(() => {
     gridRef.current?.forceUpdate();
   }, []);
@@ -28,12 +29,14 @@ function App() {
 
   const theme = useMemo(
     (): Partial<GridThemeType> => ({
+      allowRowReorder: true,
+      allowColumnReorder: true,
       autoSizeRows: false,
       autoSizeColumns: false,
       rowHeight: pixelSize,
       columnWidth: pixelSize,
-      rowHeaderWidth: 0,
-      columnHeaderHeight: 0,
+      rowHeaderWidth: headerSize,
+      columnHeaderHeight: headerSize,
       gridColumnColor: null,
       gridRowColor: null,
       rowHoverBackgroundColor: null,
@@ -48,8 +51,8 @@ function App() {
     <>
       <div
         style={{
-          width: width * pixelSize,
-          height: height * pixelSize,
+          width: width * pixelSize + headerSize,
+          height: height * pixelSize + headerSize,
           position: "relative",
         }}
       >
