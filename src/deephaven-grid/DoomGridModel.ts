@@ -4,11 +4,11 @@ import {
   KeyHandler,
   NullableGridColor,
 } from "@deephaven/grid";
-import doomUrl from "./assets/doom.wasm?url";
+import doomUrl from "../doom/doom.wasm?url";
 import { DoomKeyHandler } from "./DoomKeyHandler";
 import { GridKeyboardEvent } from "@deephaven/grid/dist/KeyHandler";
 import { DoomMetricCalculator } from "./DoomMetricCalculator";
-import NullMouseHandler from "./NullMouseHandler";
+import NullMouseHandler from "../NullMouseHandler";
 
 // Width of the game screen. Not sure how to set this dynamically, or if it's possible to.
 const WIDTH = 640;
