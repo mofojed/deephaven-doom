@@ -10,16 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@deephaven/components": "^0.72.0",
-    "@deephaven/grid": "^0.72.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
     "@ag-grid-community/client-side-row-model": "^31.3.1",
     "@ag-grid-community/core": "^31.3.1",
     "@ag-grid-community/react": "31.3.1",
     "@ag-grid-community/styles": "31.3.1",
+    "@deephaven/components": "^0.77.0",
+    "@deephaven/grid": "^0.77.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
     "@types/node": "^20.12.7",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
