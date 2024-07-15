@@ -1,11 +1,12 @@
 import {
+  CustomCell,
+  CustomRenderer,
   DataEditor,
   DataEditorRef,
   GridCell,
   GridCellKind,
   GridColumn,
   Item,
-  TextCell,
 } from "@glideapps/glide-data-grid";
 import "@glideapps/glide-data-grid/dist/index.css";
 import { useCallback, useEffect, useMemo, useRef } from "react";
@@ -16,37 +17,25 @@ const height = 200;
 const pixelSize = 4;
 const headerSize = 20;
 
+type RenderCell = CustomCell<string>;
+
 function App() {
   const gridRef = useRef<DataEditorRef>(null);
   const gridData = useMemo(() => {
-    const newData: TextCell[][] = [];
+    const newData: RenderCell[][] = [];
     for (let r = 0; r < height; r++) {
-      const row: TextCell[] = [];
+      const row: RenderCell[] = [];
       for (let c = 0; c < width; c++) {
         row.push({
-          kind: GridCellKind.Text,
-          displayData: "",
-          themeOverride: {
-            bgCell: "transparent",
-          },
-          data: "",
+          kind: GridCellKind.Custom,
+          copyData: "",
+          data: "", // Will fill in with the color of the cell when it's available
           allowOverlay: false,
         });
       }
       newData.push(row);
     }
     return newData;
-  }, []);
-
-  const cellUpdates = useMemo(() => {
-    const updates: { cell: Item }[] = [];
-
-    for (let r = 0; r < height; r++) {
-      for (let c = 0; c < width; c++) {
-        updates.push({ cell: [c, r] });
-      }
-    }
-    return updates;
   }, []);
 
   const columns: GridColumn[] = Array.from({ length: width }, (_, i) => ({
@@ -68,6 +57,7 @@ function App() {
         // Update the rowData with the new image data
         const { data } = imageData;
         const scale = imageData.width / width;
+        const newUpdates: { cell: Item }[] = [];
         for (let r = 0; r < height; r++) {
           const row = gridData[r];
           for (let c = 0; c < width; c++) {
@@ -75,10 +65,17 @@ function App() {
             const color = `rgba(${data[colorIndex]}, ${data[colorIndex + 1]}, ${
               data[colorIndex + 2]
             })`;
-            row[c].themeOverride!.bgCell = color;
+            const cell = row[c] as RenderCell;
+            if (cell.data !== color) {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              (cell as any).data = color;
+              newUpdates.push({ cell: [c, r] });
+            }
           }
         }
-        gridRef.current?.updateCells(cellUpdates);
+        if (newUpdates.length > 0) {
+          gridRef.current?.updateCells(newUpdates);
+        }
       });
       doom.start();
       window.addEventListener("keydown", doom.keyDown);
@@ -89,8 +86,28 @@ function App() {
         window.removeEventListener("keyup", doom.keyUp);
       };
     },
-    [cellUpdates, gridData]
+    [gridData]
   );
+
+  const experimentalOptions = useMemo(() => {
+    return { disableAccessibilityTree: true, disableMinimumCellWidth: true };
+  }, []);
+
+  const cellRenderer: CustomRenderer<RenderCell> = useMemo(() => {
+    return {
+      kind: GridCellKind.Custom,
+      isMatch: (cell): cell is RenderCell => cell.kind === GridCellKind.Custom,
+      draw: (args, cell) => {
+        const { ctx, rect } = args;
+        ctx.fillStyle = (cell as RenderCell).data as string;
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+      },
+    };
+  }, []);
+
+  const customRenderers = useMemo(() => {
+    return [cellRenderer];
+  }, [cellRenderer]);
 
   return (
     <div
@@ -102,6 +119,8 @@ function App() {
     >
       <DataEditor
         getCellContent={getCell}
+        customRenderers={customRenderers}
+        experimental={experimentalOptions}
         columns={columns}
         rowHeight={pixelSize}
         rows={height}
