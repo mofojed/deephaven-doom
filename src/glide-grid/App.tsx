@@ -1,6 +1,9 @@
 import {
+  CustomCell,
+  CustomRenderer,
   DataEditor,
   DataEditorRef,
+  DrawCellCallback,
   GridCell,
   GridCellKind,
   GridColumn,
@@ -16,20 +19,22 @@ const height = 200;
 const pixelSize = 4;
 const headerSize = 20;
 
+type RenderCell = CustomCell<string>;
+
 function App() {
   const gridRef = useRef<DataEditorRef>(null);
   const gridData = useMemo(() => {
-    const newData: TextCell[][] = [];
+    const newData: RenderCell[][] = [];
     for (let r = 0; r < height; r++) {
-      const row: TextCell[] = [];
+      const row: RenderCell[] = [];
       for (let c = 0; c < width; c++) {
         row.push({
-          kind: GridCellKind.Text,
-          displayData: "",
-          themeOverride: {
-            bgCell: "transparent",
-          },
-          data: "",
+          kind: GridCellKind.Custom,
+          copyData: "",
+          // themeOverride: {
+          //   bgCell: "transparent",
+          // },
+          data: "", // Will fill in with the color of the cell when it's available
           allowOverlay: false,
         });
       }
@@ -75,7 +80,9 @@ function App() {
             const color = `rgba(${data[colorIndex]}, ${data[colorIndex + 1]}, ${
               data[colorIndex + 2]
             })`;
-            row[c].themeOverride!.bgCell = color;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (row[c] as any).data = color;
+            // row[c].themeOverride!.bgCell = color;
           }
         }
         gridRef.current?.updateCells(cellUpdates);
@@ -92,6 +99,33 @@ function App() {
     [cellUpdates, gridData]
   );
 
+  const drawCell: DrawCellCallback = useCallback(({ ctx, cell, rect }) => {
+    ctx.fillStyle = (cell as RenderCell).data as string;
+    ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    // console.log("xxx drawCell", cell, rect);
+  }, []);
+
+  const experimentalOptions = useMemo(() => {
+    return { disableMinimumCellWidth: true };
+  }, []);
+
+  const cellRenderer: CustomRenderer<RenderCell> = useMemo(() => {
+    return {
+      kind: GridCellKind.Custom,
+      isMatch: (cell): cell is RenderCell => cell.kind === GridCellKind.Custom,
+      draw: (args, cell) => {
+        const { ctx, rect } = args;
+        ctx.fillStyle = (cell as RenderCell).data as string;
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+        // console.log("xxx cellRenderer draw", cell, rect);
+      },
+    };
+  }, []);
+
+  const customRenderers = useMemo(() => {
+    return [cellRenderer];
+  }, [cellRenderer]);
+
   return (
     <div
       style={{
@@ -101,7 +135,10 @@ function App() {
       }}
     >
       <DataEditor
+        drawCell={drawCell}
         getCellContent={getCell}
+        customRenderers={customRenderers}
+        experimental={experimentalOptions}
         columns={columns}
         rowHeight={pixelSize}
         rows={height}
