@@ -6,7 +6,6 @@ import {
 } from "@deephaven/grid";
 import { DoomKeyHandler } from "./DoomKeyHandler";
 import { GridKeyboardEvent } from "@deephaven/grid/dist/KeyHandler";
-import { DoomMetricCalculator } from "./DoomMetricCalculator";
 import NullMouseHandler from "../NullMouseHandler";
 import Doom from "../doom/Doom";
 
@@ -22,7 +21,6 @@ export class DoomGridModel extends GridModel {
   private doom: Doom | null = null;
 
   readonly keyHandler: KeyHandler;
-  readonly metricCalculator: DoomMetricCalculator;
   readonly mouseHandler: GridMouseHandler;
 
   constructor({
@@ -42,7 +40,6 @@ export class DoomGridModel extends GridModel {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
     this.keyHandler = new DoomKeyHandler(this.handleKeyDown, this.handleKeyUp);
-    this.metricCalculator = new DoomMetricCalculator();
     this.mouseHandler = new NullMouseHandler();
 
     this.initDoom();
