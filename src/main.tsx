@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import FPSStats from "react-fps-stats";
 import DeephavenApp from "./deephaven-grid/App.tsx";
 import AgGridApp from "./ag-grid/App.tsx";
 import GlideGridApp from "./glide-grid/App.tsx";
@@ -24,6 +25,7 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
+    <FPSStats />
     <RouterProvider router={router} />
   </React.StrictMode>
 );
