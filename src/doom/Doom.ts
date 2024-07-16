@@ -111,6 +111,8 @@ class Doom {
       throw new Error("Doom instance is null");
     }
     this.doomInstance.add_browser_event(0, getDoomKeyCode(event));
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   /** Send a keyup event to the doom instance */
@@ -119,6 +121,8 @@ class Doom {
       throw new Error("Doom instance is null");
     }
     this.doomInstance.add_browser_event(1, getDoomKeyCode(event));
+    event.preventDefault();
+    event.stopPropagation();
   }
 
   private stopRenderLoop() {
