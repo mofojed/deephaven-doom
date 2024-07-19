@@ -6,6 +6,7 @@ import DeephavenApp from "./deephaven-grid/App.tsx";
 import AgGridApp from "./ag-grid/App.tsx";
 import GlideGridApp from "./glide-grid/App.tsx";
 import RegularTableApp from "./regular-table/App.tsx";
+import DirectCanvasApp from "./direct-canvas/App.tsx";
 
 import "./index.css";
 
@@ -25,6 +26,10 @@ const router = createBrowserRouter([
   {
     path: "/regular-table",
     element: <RegularTableApp />,
+  },
+  {
+    path: "/direct-canvas",
+    element: <DirectCanvasApp />,
   },
 ]);
 
