@@ -5,6 +5,7 @@ import FPSStats from "react-fps-stats";
 import DeephavenApp from "./deephaven-grid/App.tsx";
 import AgGridApp from "./ag-grid/App.tsx";
 import GlideGridApp from "./glide-grid/App.tsx";
+import RegularTableApp from "./regular-table/App.tsx";
 
 import "./index.css";
 
@@ -20,6 +21,10 @@ const router = createBrowserRouter([
   {
     path: "/glide-grid",
     element: <GlideGridApp />,
+  },
+  {
+    path: "/regular-table",
+    element: <RegularTableApp />,
   },
 ]);
 
