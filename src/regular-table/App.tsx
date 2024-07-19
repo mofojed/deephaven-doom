@@ -13,6 +13,8 @@ function App() {
   const tableRef = useRef<RegularTableElement | null>(null);
   const imageDataRef = useRef<ImageData | null>(null);
   const animationFrameRef = useRef<number | null>(null);
+  // It's so slow, we need to skip frames
+  const nextRenderTime = useRef<number>(0);
   const setRegularTable = useCallback(
     async (table: RegularTableElement | null) => {
       tableRef.current = table;
@@ -59,10 +61,14 @@ function App() {
   useEffect(function initDoom() {
     const doom = new Doom((imageData) => {
       imageDataRef.current = imageData;
-      cancelAnimationFrame(animationFrameRef.current ?? 0);
-      animationFrameRef.current = window.requestAnimationFrame(() => {
-        tableRef.current?.draw();
-      });
+      const now = performance.now();
+      if (now < nextRenderTime.current) {
+        // Drop the frame
+        return;
+      }
+      tableRef.current?.draw();
+      const renderTime = performance.now() - now;
+      nextRenderTime.current = now + renderTime;
     });
     doom.start();
     window.addEventListener("keydown", doom.keyDown);
