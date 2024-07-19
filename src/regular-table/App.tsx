@@ -12,7 +12,6 @@ const pixelSize = 10;
 function App() {
   const tableRef = useRef<RegularTableElement | null>(null);
   const imageDataRef = useRef<ImageData | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
   // It's so slow, we need to skip frames
   const nextRenderTime = useRef<number>(0);
   const setRegularTable = useCallback(
