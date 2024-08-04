@@ -39,8 +39,8 @@ const router = createBrowserRouter([
 ]);
 
 createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
+  <>
     <FPSStats />
     <RouterProvider router={router} />
-  </React.StrictMode>
+  </>
 );
