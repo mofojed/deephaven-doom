@@ -5,6 +5,8 @@ const WIDTH = 640;
 const HEIGHT = 400;
 
 type DoomInstance = {
+  close: () => void;
+  exit: () => void;
   main: () => void;
   add_browser_event: (event: number, keyCode: number) => void;
   doom_loop_step: () => void;
@@ -44,6 +46,7 @@ class Doom {
   private readonly onUpdate: (imageData: ImageData) => void;
   private readonly memory: WebAssembly.Memory;
   private animationFrameId: number | null = null;
+  private pendingInstance: Promise<DoomInstance> | null = null;
   private doomInstance: DoomInstance | null = null;
 
   /**
@@ -64,6 +67,27 @@ class Doom {
 
   /** Start the Doom instance and loop rendering */
   async start() {
+    if (this.pendingInstance != null) {
+      throw new Error("Doom instance already starting");
+    }
+
+    const pendingInstance = this.createInstance();
+    this.pendingInstance = pendingInstance;
+    const doomInstance = await this.pendingInstance;
+    if (pendingInstance !== this.pendingInstance) {
+      console.log("Instance was cancelled before it started");
+      doomInstance.exit();
+      return;
+    }
+
+    doomInstance.main();
+
+    this.doomInstance = doomInstance;
+
+    this.startRenderLoop();
+  }
+
+  private async createInstance(): Promise<DoomInstance> {
     const response = await fetch(doomUrl);
 
     const wasm = await WebAssembly.instantiateStreaming(response, {
@@ -76,21 +100,22 @@ class Doom {
         js_draw_screen: this.handleDrawScreen,
       },
     });
+
     console.log("Obj is", wasm);
     console.log("instance is", wasm.instance);
     console.log("module is ", wasm.module);
     console.log("exports is", wasm.instance.exports);
 
-    const doomInstance = wasm.instance.exports as DoomInstance;
-    doomInstance.main();
-
-    this.doomInstance = doomInstance;
-    this.startRenderLoop();
+    return wasm.instance.exports as DoomInstance;
   }
 
   /** Stop the render loop */
   async stop() {
     this.stopRenderLoop();
+    if (this.doomInstance !== null) {
+      this.doomInstance.exit();
+    }
+    this.pendingInstance = null;
   }
 
   private startRenderLoop() {
