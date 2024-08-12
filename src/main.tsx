@@ -10,32 +10,37 @@ import CanvasImage from "./canvas-image/App.tsx";
 
 import "./index.css";
 
-const router = createBrowserRouter([
+const router = createBrowserRouter(
+  [
+    {
+      path: "/",
+      element: <DeephavenApp />,
+    },
+    {
+      path: "/ag-grid",
+      element: <AgGridApp />,
+    },
+    {
+      path: "/glide-grid",
+      element: <GlideGridApp />,
+    },
+    {
+      path: "/regular-table",
+      element: <RegularTableApp />,
+    },
+    {
+      path: "/direct-canvas",
+      element: <DirectCanvasApp />,
+    },
+    {
+      path: "/canvas-image",
+      element: <CanvasImage />,
+    },
+  ],
   {
-    path: "/",
-    element: <DeephavenApp />,
-  },
-  {
-    path: "/ag-grid",
-    element: <AgGridApp />,
-  },
-  {
-    path: "/glide-grid",
-    element: <GlideGridApp />,
-  },
-  {
-    path: "/regular-table",
-    element: <RegularTableApp />,
-  },
-  {
-    path: "/direct-canvas",
-    element: <DirectCanvasApp />,
-  },
-  {
-    path: "/canvas-image",
-    element: <CanvasImage />,
-  },
-]);
+    basename: import.meta.env.BASE_URL,
+  }
+);
 
 createRoot(document.getElementById("root")!).render(
   <>
