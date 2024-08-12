@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-
+    base: "/deephaven-doom/",
     resolve: {
       alias: useDhcPackages
         ? [
